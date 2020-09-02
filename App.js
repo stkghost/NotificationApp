@@ -1,21 +1,27 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import {StyleSheet, ImageBackground} from 'react-native';
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+import HomeSceen from './src/components/HomeScreen.js';
+//import bgImage from './src/images/dark-metal.jpg';
 
-const styles = StyleSheet.create({
-  container: {
+export default class App extends React.Component {
+  render(){
+    return(
+      <ImageBackground 
+        style = {styles.backgroundContainer}
+        source = {require('./src/images/dark-metal.jpg')} >
+          <HomeSceen />
+      </ImageBackground>
+    );
+  }
+} 
+const styles = StyleSheet.create ({
+  backgroundContainer: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
     justifyContent: 'center',
-  },
+    alignItems: 'center'
+  }
 });
