@@ -1,27 +1,15 @@
 import React from 'react';
-import {StyleSheet, ImageBackground} from 'react-native';
+import {StyleSheet, SafeAreaView} from 'react-native';
 
-import HomeSceen from './src/components/HomeScreen.js';
+import LoginScreen from './src/components/LoginScreen.js';
 //import bgImage from './src/images/dark-metal.jpg';
 
 export default class App extends React.Component {
   render(){
     return(
-      <ImageBackground 
-        style = {styles.backgroundContainer}
-        source = {require('./src/images/dark-metal.jpg')} >
-          <HomeSceen />
-      </ImageBackground>
+      
+        <LoginScreen />
+      
     );
   }
 } 
-const styles = StyleSheet.create ({
-  backgroundContainer: {
-    flex: 1,
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center'
-  }
-});
