@@ -246,6 +246,6 @@ const styles = StyleSheet.create ({
   },
   forgotText: {
     color: 'white',
-    // alignSelf: 'center'
+    
   }
 });
