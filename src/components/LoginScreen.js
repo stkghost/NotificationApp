@@ -1,9 +1,125 @@
 import React from 'react';
-import {Text, View, StyleSheet, ImageBackground, Image, TextInput, Dimensions, SafeAreaView, TouchableOpacity, } from 'react-native';
+import {Text, View, StyleSheet, ImageBackground, Image, TextInput, Dimensions, Alert, ActivityIndicator, TouchableOpacity, } from 'react-native';
+import * as firebase from "firebase/app";
+
+// Add the Firebase products that you want to use
+import "firebase/auth";
+import "firebase/firestore";
+
 
 const {width: WIDTH } = Dimensions.get('window')
 
 export  default class LoginScreen extends React.Component {
+
+  constructor(props){
+    super(props);
+    this.state={
+      mail: '',
+      password: '',
+      isLoading: false,
+      messege: '',
+
+    }
+  }
+
+  componentDidMount(){
+    const firebaseConfig = {
+    apiKey: "AIzaSyAkPHDJG1Zib5ediNobarSVnpUn0lDmOdQ",
+    authDomain: "pushnotification-66cac.firebaseapp.com",
+    databaseURL: "https://pushnotification-66cac.firebaseio.com",
+    projectId: "pushnotification-66cac",
+    storageBucket: "pushnotification-66cac.appspot.com",
+    messagingSenderId: "162463503291",
+    appId: "1:162463503291:web:a5ec678e831658a39b2a9e",
+    measurementId: "G-6CS81DJXVR"
+    }
+    firebase.initializeApp(firebaseConfig) 
+  }
+  onChangeHandler(field, value) {
+    this.setState({ 
+        [field]: value
+     });
+}
+tryLogin(){
+    this.setState({isLoading: true, messege: ''});
+        const {mail, password} = this.state;
+
+        const loginUserSucess = user => {
+            this.setState({messege: <Text style={{color: 'white'}}>Sucesso!</Text>})
+        } 
+        const loginUserFaild = error => {
+            this.setState({
+                messege: this.getMesseByErrorCode(error.code)
+            })
+        }
+
+        firebase.auth().signInWithEmailAndPassword(mail, password) 
+        .then(loginUserSucess)
+        .catch(error => {
+
+            if(error.code === 'auth/user-not-found')
+            {
+                Alert.alert ('Usuário não encontrado',
+                'Deseja cadastrar-se?',
+                [{
+                    text: 'Não',
+                    // onPress: () => {},
+                   },{
+                    text: 'Sim',
+                    onPress: () => {
+                        firebase
+                            .auth()
+                            .createUserWithEmailAndPassword( mail, password)
+                            .then(loginUserSucess)
+                            .catch(loginUserFaild)
+                        }
+                   }],
+                   {cancelable: false}
+                )
+            } else {
+                loginUserFaild
+            }
+            
+        })
+        .then(() => this.setState({isLoading: false}) )
+    }
+    getMesseByErrorCode(errorCode){
+        switch(errorCode){
+            case 'auth/wrong-password':
+                return <Text style={{color: 'white'}}>Senha Incorreta</Text>
+            case 'auth/user-not-found':
+                return <Text style={{color: 'white'}}>usuário não encontrado</Text>
+            default: 
+                return <Text style={{color: 'white'}}>Erro desconhecido</Text>
+        }
+    }
+
+    renderMessege(){
+        const {messege} = this.state;
+        if (!messege)
+            return null;
+        return(
+            <View>
+                <Text>
+                    {messege}
+                </Text>
+            </View>
+        )
+    }
+    
+renderButton(){
+    if (this.state.isLoading)
+        return<ActivityIndicator />
+    return (
+        <TouchableOpacity style={styles.buttonContainer}
+        onPress={() => this.tryLogin()} 
+    >
+        <Text style={styles.textButton}>
+            Entrar
+        </Text>
+    </TouchableOpacity>
+    )
+}
   render () {
     return (
        
@@ -14,7 +130,6 @@ export  default class LoginScreen extends React.Component {
                 <Image style={styles.logo}
                 source ={require('../images/macohin-branca.png')}>
                 </Image>
-                <Text style = {styles.textContent}> Sistema Intranet </Text>
             </View>
                 <View style={styles.loginContainer}>    
                     <View>
@@ -24,6 +139,8 @@ export  default class LoginScreen extends React.Component {
                         placeholderTextColor = {'#e0e0e0'}
                         //underlineColorAndroid = 'white'
                         autoCapitalize = 'none'
+                        value={this.state.mail}
+                        onChangeText={value => this.onChangeHandler('mail', value)}
                         >
                         </TextInput>
                     </View>
@@ -35,14 +152,18 @@ export  default class LoginScreen extends React.Component {
                         placeholderTextColor = {'#e0e0e0'}
                         //underlineColorAndroid = 'white'
                         autoCapitalize = 'none'
+                        value={this.state.password}
+                        onChangeText={value => this.onChangeHandler('password', value)}
                         >
                         </TextInput>
                     </View>    
-                        <TouchableOpacity style={styles.buttonContainer}>
+                        {this.renderButton()}
+                        {this.renderMessege()}
+                        {/* <TouchableOpacity style={styles.buttonContainer}>
                         <Text style={styles.textButton}>
                             Entrar
                         </Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                     
                         <TouchableOpacity style={styles.forgotContainer}>
                         <Text style={styles.forgotText}>Esqueceu a senha?</Text>
